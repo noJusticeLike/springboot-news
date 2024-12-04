@@ -45,7 +45,7 @@ public class JwtTokenProvider {
             Jwts.parser().verifyWith((SecretKey) key()).build().parse(token);
             return true;
         } catch (MalformedJwtException malformedJwtException) {
-           throw new NewsApiException(HttpStatus.BAD_REQUEST, "Недійсний токен") ;
+            throw new NewsApiException(HttpStatus.BAD_REQUEST, "Недійсний токен") ;
         }  catch (ExpiredJwtException expiredJwtException) {
             throw new NewsApiException(HttpStatus.BAD_REQUEST, "Термін дії токену сплив");
         } catch (UnsupportedJwtException unsupportedJwtException) {

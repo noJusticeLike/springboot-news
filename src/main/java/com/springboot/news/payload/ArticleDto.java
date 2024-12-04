@@ -13,17 +13,17 @@ public class ArticleDto {
     private Long id;
 
     @Schema(description = "News Article Title")
-    @NotEmpty
+    @NotEmpty(message = "У статті має бути заголовок")
     @Size(min = 2, message = "Заголовок статті має містити принаймні 2 символи")
     private String title;
 
     @Schema(description = "News Article Content")
-    @NotEmpty
+    @NotEmpty(message="У статті має бути вміст")
     @Size(min = 10, message = "Вміст статті має містити принаймні 10 символів")
     private String content;
 
     @Schema(description = "News Article Image URL")
-    @NotEmpty
+    @NotEmpty(message = "У статті має бути зображення")
     private String imageURL;
 
     @Schema(description = "News Article Date")
