@@ -54,11 +54,15 @@
                 </div>
 
                 <div class="row mb-3">
-                    <label class="col-sm-4 col-form-label">CategoryId</label>
+                    <label class="col-sm-4 col-form-label">Category</label>
                     <div class="col-sm-8">
-                        <input class="form-control" th:field="${articleDto.categoryId}">
-                        <p th:if="${#fields.hasErrors('categoryId')}" th:errorclass="text-danger"
-                           th:errors="${articleDto.categoryId}"></p>
+                        <select class="form-select" th:field="${articleDto.categoryId}">
+                            <option th:each="category: ${categories}"
+                                    th:value="${category.id}"
+                                    th:selected="${category.id == articleDto.categoryId}"
+                                    th:text="${category.name}">
+                            </option>
+                        </select>
                     </div>
                 </div>
 

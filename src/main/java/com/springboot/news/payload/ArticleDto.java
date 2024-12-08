@@ -31,4 +31,7 @@ public class ArticleDto {
 
     @Schema(description = "News Article Category")
     private Long categoryId;
+
+    @Schema(description = "News Article Category Name")
+    private String categoryName;
 }

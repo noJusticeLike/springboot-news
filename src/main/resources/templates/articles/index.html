@@ -38,7 +38,11 @@
     <h1 class="text-center-my-4">Articles</h1>
     <a class="btn btn-primary" href="/articles/create">Create article</a>
 
-    <table class="table mt-3">
+    <div class="alert alert-danger mt-3" role="alert" th:if="${articles.isEmpty()}">
+        <p class="">No articles found =(</p>
+    </div>
+
+    <table class="table mt-3" th:if="${!articles.isEmpty()}">
         <thead class="table-dark">
         <tr>
             <th>Title</th>
@@ -56,7 +60,14 @@
             <td>
                 <img th:src="${article.imageURL}" alt="..." width="100">
             </td>
-            <td th:text="${article.categoryId}"></td>
+            <td th:switch="${article.categoryName}">
+                <span th:case="'Політика ❗'" class="text-danger">Політика</span>
+                <span th:case="'Технології ⚙'" class="text-info">Технології</span>
+                <span th:case="'Законопроєкти ⚖'" class="text-primary">Законопроєкти</span>
+                <span th:case="'Графіки відключень 💡'" class="text-warning">Графіки відключень</span>
+                <span th:case="'Культура 🖼'" class="text-success">Культура</span>
+                <span th:case="*" class="text-dark">{article.categoryName}</span>
+            </td>
             <td th:text="${article.date.toString().substring(0, 10)}"></td>
             <td style="white-space:nowrap">
                 <a class="btn btn-primary btn-sm" th:href="@{/articles/edit(id=${article.id})}">

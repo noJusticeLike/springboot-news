@@ -1,7 +1,9 @@
 package com.springboot.news.controller;
 
 import com.springboot.news.payload.ArticleDto;
+import com.springboot.news.payload.CategoryDto;
 import com.springboot.news.service.ArticleService;
+import com.springboot.news.service.CategoryService;
 import com.springboot.news.utils.AppConstants;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -15,9 +17,11 @@ import java.util.List;
 @RequestMapping("/articles")
 public class ArticleController {
     private ArticleService articleService;
+    private CategoryService categoryService;
 
-    public ArticleController(ArticleService articleService) {
+    public ArticleController(ArticleService articleService, CategoryService categoryService) {
         this.articleService = articleService;
+        this.categoryService = categoryService;
     }
 
     @GetMapping({"", "/"})
@@ -43,10 +47,12 @@ public class ArticleController {
     public String showCreatePage(Model model) {
         ArticleDto articleDto = new ArticleDto();
         model.addAttribute("articleDto", articleDto);
+        List<CategoryDto> categories = categoryService.getAllCategories();
+        model.addAttribute("categories", categories);
         return "articles/CreateArticle";
     }
 
-    @PostMapping("create")
+    @PostMapping("/create")
     public String createArticle(
             @Valid @ModelAttribute ArticleDto articleDto, BindingResult result) {
         if (result.hasErrors()) {
@@ -63,6 +69,8 @@ public class ArticleController {
         try {
             ArticleDto articleDto = articleService.getArticleById(id);
             model.addAttribute("articleDto", articleDto);
+            List<CategoryDto> categories = categoryService.getAllCategories();
+            model.addAttribute("categories", categories);
         } catch(Exception ex) {
             System.out.println("Exception: " + ex.getMessage());
             return "redirect:/articles";
@@ -71,7 +79,7 @@ public class ArticleController {
     }
 
     @PostMapping("/edit")
-    public String updateArticle(Model model, @RequestParam Long id, @Valid @ModelAttribute ArticleDto articleDto, BindingResult result) {
+    public String updateArticle(@RequestParam Long id, @Valid @ModelAttribute ArticleDto articleDto, BindingResult result) {
         try {
             if (result.hasErrors()) {
                 return "articles/EditArticle";

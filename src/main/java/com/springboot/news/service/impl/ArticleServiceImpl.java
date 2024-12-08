@@ -114,6 +114,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     private ArticleDto mapToDto(Article article) {
         ArticleDto articleDto = mapper.map(article, ArticleDto.class);
+        articleDto.setCategoryName(article.getCategory().getName());
         return articleDto;
     }
 
