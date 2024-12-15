@@ -2,11 +2,9 @@ package com.springboot.news.service.impl;
 
 import com.springboot.news.exception.ResourceNotFoundException;
 import com.springboot.news.model.Article;
-import com.springboot.news.model.Category;
 import com.springboot.news.payload.ArticleDto;
 import com.springboot.news.payload.ArticleResponse;
 import com.springboot.news.repository.ArticleRepository;
-import com.springboot.news.repository.CategoryRepository;
 import com.springboot.news.service.ArticleService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -22,23 +20,15 @@ import java.util.stream.Collectors;
 public class ArticleServiceImpl implements ArticleService {
     private ArticleRepository articleRepository;
     private ModelMapper mapper;
-    private CategoryRepository categoryRepository;
 
-    public ArticleServiceImpl(ArticleRepository articleRepository, ModelMapper mapper, CategoryRepository categoryRepository) {
+    public ArticleServiceImpl(ArticleRepository articleRepository, ModelMapper mapper) {
         this.articleRepository = articleRepository;
         this.mapper = mapper;
-        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public ArticleDto createArticle(ArticleDto articleDto) {
-        Category category = categoryRepository.findById(articleDto.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", articleDto.getCategoryId()));
-
-        Article article = mapToEntity(articleDto);
-        article.setCategory(category);
-        Article newArticle = articleRepository.save(article);
-        return mapToDto(newArticle);
+        return null;
     }
 
     @Override
@@ -72,20 +62,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public ArticleDto updateArticle(ArticleDto articleDto, Long id) {
-        Article article = articleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Article", "id", id));
-
-        Category category = categoryRepository.findById(articleDto.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", articleDto.getCategoryId()));
-
-        article.setTitle(articleDto.getTitle());
-        article.setContent(articleDto.getContent());
-        article.setImageURL(articleDto.getImageURL());
-        article.setDate(articleDto.getDate());
-        article.setCategory(category);
-
-        Article updatedArticle = articleRepository.save(article);
-        return mapToDto(updatedArticle);
+        return null;
     }
 
     @Override
@@ -98,12 +75,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public List<ArticleDto> getArticlesByCategory(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
-
-        List<Article> articles = articleRepository.findByCategoryId(categoryId);
-
-        return articles.stream().map(this::mapToDto).collect(Collectors.toList());
+        return List.of();
     }
 
     @Override
@@ -114,7 +86,6 @@ public class ArticleServiceImpl implements ArticleService {
 
     private ArticleDto mapToDto(Article article) {
         ArticleDto articleDto = mapper.map(article, ArticleDto.class);
-        articleDto.setCategoryName(article.getCategory().getName());
         return articleDto;
     }
 

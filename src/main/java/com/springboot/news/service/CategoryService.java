@@ -5,13 +5,15 @@ import com.springboot.news.payload.CategoryDto;
 import java.util.List;
 
 public interface CategoryService {
-    CategoryDto addCategory(CategoryDto categoryDto);
+    Long addCategory(CategoryDto categoryDto);
+
+    List<Long> addCategories(List<CategoryDto> categoryDtos);
 
     CategoryDto getCategory(Long categoryId);
 
     List<CategoryDto> getAllCategories();
 
-    CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId);
+    void updateCategory(CategoryDto categoryDto, Long categoryId);
 
     void deleteCategory(Long categoryId);
 
