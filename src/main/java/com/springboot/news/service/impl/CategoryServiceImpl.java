@@ -3,85 +3,68 @@ package com.springboot.news.service.impl;
 import com.springboot.news.exception.ResourceNotFoundException;
 import com.springboot.news.model.Category;
 import com.springboot.news.payload.CategoryDto;
-import com.springboot.news.repository.CategoryDao;
+import com.springboot.news.repository.CategoryRepository;
 import com.springboot.news.service.CategoryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    private final CategoryDao categoryDao;
-    private final ModelMapper mapper;
+    private CategoryRepository categoryRepository;
+    private ModelMapper mapper;
 
-    public CategoryServiceImpl(CategoryDao categoryDao, ModelMapper mapper) {
-        this.categoryDao = categoryDao;
+    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper mapper) {
+        this.categoryRepository = categoryRepository;
         this.mapper = mapper;
     }
 
     @Override
-    @Transactional
-    public Long addCategory(CategoryDto categoryDto) {
+    public CategoryDto addCategory(CategoryDto categoryDto) {
         Category category = mapper.map(categoryDto, Category.class);
-        return categoryDao.create(category);
-    }
+        Category savedCategory = categoryRepository.save(category);
 
-    @Override
-    @Transactional
-    public List<Long> addCategories(List<CategoryDto> categoryDtos) {
-        List<Category> categories = categoryDtos.stream()
-                .map(categoryDto -> mapper.map(categoryDto, Category.class))
-                .toList();
-
-        return categories.stream()
-                .map(categoryDao::create)
-                .collect(Collectors.toList());
+        return mapper.map(savedCategory, CategoryDto.class);
     }
 
     @Override
     public CategoryDto getCategory(Long categoryId) {
-        Category category = categoryDao.read(categoryId);
-        if (category == null) {
-            throw new ResourceNotFoundException("Category", "id", categoryId);
-        }
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+
         return mapper.map(category, CategoryDto.class);
     }
 
     @Override
     public List<CategoryDto> getAllCategories() {
-        List<Category> categories = categoryDao.readAll();
-        return categories.stream().map(category -> mapper.map(category, CategoryDto.class))
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream().map((category) -> mapper.map(category, CategoryDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
-    @Transactional
-    public void updateCategory(CategoryDto categoryDto, Long categoryId) {
-        Category category = categoryDao.read(categoryId);
-        if (category == null) {
-            throw new ResourceNotFoundException("Category", "id", categoryId);
-        }
+    public CategoryDto updateCategory(CategoryDto categoryDto, Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+        category.setId(categoryId);
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
-        categoryDao.update(category);
+        Category updatedCategory = categoryRepository.save(category);
+        return mapper.map(updatedCategory, CategoryDto.class);
     }
 
     @Override
-    @Transactional
     public void deleteCategory(Long categoryId) {
-        Category category = categoryDao.read(categoryId);
-        if (category == null) {
-            throw new ResourceNotFoundException("Category", "id", categoryId);
-        }
-        categoryDao.delete(categoryId);
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+        categoryRepository.delete(category);
     }
 
     @Override
     public List<CategoryDto> searchCategories(String query) {
-        List<Category> categories = categoryDao.search(query);
+        List<Category> categories = categoryRepository.searchCategories(query);
         return categories.stream().map(category -> mapper.map(category, CategoryDto.class)).collect(Collectors.toList());
     }
 }

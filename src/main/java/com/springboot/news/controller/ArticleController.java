@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -49,8 +50,7 @@ public class ArticleController {
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
-            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false)
-            String sortDir
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ){
         return articleService.getAllArticles(pageNo, pageSize, sortBy, sortDir);
     }
@@ -73,10 +73,22 @@ public class ArticleController {
     @SecurityRequirement(name = "Bear Authentication")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<ArticleDto> updateArticle(@Valid @RequestBody ArticleDto articleDto,
-                                                    @PathVariable(name = "id") Long id) {
+    public ResponseEntity<ArticleDto> updateArticle(@Valid @RequestBody ArticleDto articleDto, @PathVariable(name = "id") Long id) {
         ArticleDto articleResponse = articleService.updateArticle(articleDto, id);
         return new ResponseEntity<>(articleResponse, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Update Articles REST API",
+            description = "Update Articles REST API is used to update a particular articles in database"
+    )
+    @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
+    @SecurityRequirement(name = "Bear Authentication")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping()
+    public ResponseEntity<List<ArticleDto>> updateArticles(@RequestBody List<ArticleDto> articlesDto) {
+        List<ArticleDto> updatedArticles = articleService.updateArticles(articlesDto);
+        return ResponseEntity.ok(updatedArticles);
     }
 
     @Operation(
@@ -112,5 +124,27 @@ public class ArticleController {
     public ResponseEntity<List<ArticleDto>> searchArticles(@RequestParam("query") String query) {
         List<ArticleDto> articleDtos = articleService.searchArticles(query);
         return ResponseEntity.ok(articleDtos);
+    }
+
+    @Operation(
+            summary = "Named Search Articles REST API",
+            description = "Named Search Articles REST API is used to fetch all articles by query from database"
+    )
+    @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
+    @GetMapping("/named_search")
+    public ResponseEntity<List<ArticleDto>> namedSearchArticles(@RequestParam("query") String query) {
+        List<ArticleDto> articleDtos = articleService.findByTitleOrContent(query);
+        return ResponseEntity.ok(articleDtos);
+    }
+
+    @Operation(
+            summary = "Date Search Articles REST API",
+            description = "Date Search Articles REST API is used to fetch all articles after date from database"
+    )
+    @ApiResponse(responseCode = "200", description = "Http Status 200 SUCCESS")
+    @GetMapping("/date_search")
+    public List<ArticleDto> getArticlesAfterDate(@RequestParam String date) {
+        LocalDate localDate = LocalDate.parse(date);
+        return articleService.getArticlesAfterDate(localDate);
     }
 }

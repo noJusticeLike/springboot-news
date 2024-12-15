@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -15,4 +16,8 @@ public interface ArticleRepository extends JpaRepository<Article, Long> {
             "p.title LIKE CONCAT('%', :query, '%')" +
             "Or p.content LIKE CONCAT('%', :query, '%')")
     List<Article> searchArticles(String query);
+
+    List<Article> findByTitleOrContent(String query);
+
+    List<Article> findByDateAfter(LocalDate date);
 }

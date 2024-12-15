@@ -14,6 +14,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@NamedQuery(
+        name = "Article.findByTitleOrContent",
+        query = "SELECT a FROM Article a WHERE a.title LIKE CONCAT('%', :query, '%') OR a.content LIKE CONCAT('%', :query, '%')"
+)
 @Table(
         name = "articles", uniqueConstraints = {@UniqueConstraint(columnNames = {"title"})}
 )
